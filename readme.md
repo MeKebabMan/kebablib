@@ -14,6 +14,22 @@ You can add the following:
 
 ``-DKEBAB_ABORT`` to enable abort on fatal errors.
 
+### Guide to compiling
+
+You can use the makefile and create a .so / .dll
+
+```bash
+# EXAMPLE
+make CompileLib=true LibExtension=dll
+```
+
+OR you can manually compile by just dropping the .c and .h into your project directory and compiling it like its own of your own, however please compile with ``-lm`` as this library uses functions like ``pow()`` and etc
+
+```bash
+# EXAMPLE
+gcc kebablic.c -o something.out -Iinclude -lm
+```
+
 ### Functions
 ```c
 
