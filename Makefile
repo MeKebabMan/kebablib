@@ -53,7 +53,7 @@ $(Target): $(Objs) $(TestTarget)
 
 ifeq ($(CompileLib),true)
 $(LibTarget): $(Objs)
-	$(CC) -fPIC -shared $^ -o $@.$(LibExtension) $(LibCflags) $(headers)
+	$(CC) -shared $^ -o $@.$(LibExtension) $(LibCflags) $(headers)
 endif
 
 # Phony rules
