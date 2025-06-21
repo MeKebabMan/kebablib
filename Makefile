@@ -1,69 +1,81 @@
-# variables
-Src := src
-Bin := bin
-CC := clang
-Testfile := test.c
-Target := $(Bin)/test.out
+src := src
+bin := bin
+cc := clang
 
-# Lib
+# Test target
 
-CompileLib := false
-LibTarget := $(Bin)/kebablib
-LibExtension := so
-LibCflags := -march=native -O3 -DNDEBUG -DKEBAB_ABORT
+test_extension := out
+test_target := ./$(bin)/testbinary.$(test_extension)
+test_cflags := -march=native -O0 -DKEBAB_DEBUG -DKEBAB_ABORT -g3 -ggdb -fsanitize=address,undefined 
 
-headers := -Iinclude
-cflags := -march=native -O3 -Wall -Wextra -fsanitize=address,undefined -g3 -ggdb -fstack-protector-strong -DKEBAB_DEBUG -DKEBAB_ABORT
-  
-# files
+# Lib target
 
-Srcs = $(wildcard $(Src)/*.c)
-Objs = $(patsubst $(Src)/%.c, $(Bin)/%.obj, $(Srcs))
-TestTarget = $(Bin)/test.obj
+lib_extension = so
+lib_target := ./$(bin)/kebablib.$(lib_extension)
+lib_cflags := -march=native -O3 -DNDEBUG
 
-ifeq ($(CompileLib),true)
-All: $(LibTarget)
+target ?= test
+cflags := $(test_cflags)
+
+ifeq ($(target), test)
+# ==== test ====
+	src_files := $(wildcard $(src)/*.c) test.c
+	target_file := $(test_target)
+else ifeq ($(target), lib)
+# ==== lib ====
+	target_file := $(lib_target)
+	src_files := $(wildcard $(src)/*.c)
+	cflags := $(lib_cflags)
+else ifeq ($(target), static)
+# ==== static ====
+	target_file := $(lib_target)
+	src_files := $(wildcard $(src)/*.c)
+	cflags := $(lib_cflags)
 else
-All: $(Target)
+	$(error INVALID TARGET)
 endif
 
-# Creating object files
+object_files := $(patsubst %.c, $(bin)/%.obj, $(notdir $(src_files)))
 
-ifeq ($(CompileLib),true)
-$(Bin)/%.obj: $(Src)/%.c
+# Compiling
+
+vpath %.c $(src)
+
+ifeq ($(target), lib)
+# ==== lib ====
+$(bin)/%.obj: %.c
 	@mkdir -p $(dir $@)
-
-	$(CC) -c -fPIC $< -o $@ $(LibCflags) -lm $(headers)
+	$(cc) -c -fPIE $< -o $@ $(cflags)  -Iinclude
+# Linking
+$(target_file): $(object_files)
+	@mkdir -p $(dir $@)
+	$(cc) -shared -fPIC $^ -o $@ $(cflags) -lm -Iinclude 
+else ifeq ($(target), static)
+# ==== static ====
+$(bin)/%.obj: %.c
+	@mkdir -p $(dir $@)
+	$(cc) -c $< -o $@ $(cflags) -Iinclude
+# Linking
+$(target_file): $(object_files)
+	@mkdir -p $(dir $@)
+	ar rcs $@ $^
+else ifeq ($(target), test)
+# ==== test ====
+$(bin)/%.obj: %.c
+	@mkdir -p $(dir $@)
+	$(cc) -c $< -o $@ $(cflags) -Iinclude
+# Linking
+$(target_file): $(object_files)
+	@mkdir -p $(dir $@)
+	$(cc) $^ -o $@ $(cflags) -lm -Iinclude
 else
-$(Bin)/%.obj: $(Src)/%.c
-	@mkdir -p $(dir $@)
-
-	$(CC) -c $< -o $@ $(cflags) -lm $(headers)
-endif
-
-# Compile the test file as well
-$(TestTarget): $(Testfile)
-	@mkdir -p $(dir $@)
-	$(CC) -c $< -o $@ $(cflags) $(headers)
-
-# Linking 
-
-$(Target): $(Objs) $(TestTarget)
-	$(CC) $^ -o $@ $(cflags) $(headers)
-
-ifeq ($(CompileLib),true)
-$(LibTarget): $(Objs)
-	$(CC) -shared $^ -o $@.$(LibExtension) $(LibCflags) $(headers)
+	$(error INVALID TARGET)
 endif
 
 # Phony rules
 
-ifeq ($(CompileLib),true)
-clean:
-	rm -f $(LibTarget) $(Objs)
-else
-clean:
-	rm -f $(Target) $(TestTarget) $(Objs)
-endif	
+clean: ./bin/*
+# I DONT TRUST A DAMN VARIABLE
+	@rm -r $^
 
 .PHONY: clean
