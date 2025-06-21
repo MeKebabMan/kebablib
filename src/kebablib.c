@@ -9,7 +9,7 @@
 #include <string.h>
 
 /*
-    Marcos I decided to define to help me out for this FILE
+    Macros I decided to define to help me out for this FILE
 */
 
 #ifdef KEBAB_ABORT
@@ -23,7 +23,7 @@
 #endif
 
 /*
-    Define marcos for more readable boolean returns
+    Define macros for more readable boolean returns
 */
 
 #define KEBAB_YES 1
@@ -44,7 +44,7 @@
     } while(0);
 
 /*
-    Define a marco for assertions..
+    Define a macro for assertions..
 */
 
 #ifndef NDEBUG
