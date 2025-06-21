@@ -1,3 +1,8 @@
+/**
+* @file kebablib.h
+* @brief A library containing useful marcos and functions for my projects.
+*/
+
 #ifndef KEBAB_H
 #define KEBAB_H
 
@@ -6,31 +11,17 @@ extern "C"
 {
 #endif
 
-
-/*
-KebabLib!
-
-A library containing useful marcos and functions for my projects, feel free to use!
-
-Library flags:
-
-KEBAB_DEBUG (Enables debug logs and the use of assertions)
-
-KEBAB_ABORT (Enables abort() on fatal errors handled by the library)
-
-*/
-
 // Headers
 
 #include <stdint.h>
 #include <stdio.h>
 #include <stdbool.h>
 
-// Marcos
+// Macros 
 
 /**
-    Forces the inline (Gives a strong-hint to the compiler)
-    WARNING: INLINE MAY NOT WORK WITH "-O0" FLAG OR WITH COMPLEX STUFF EVEN WITH "force_inline"!
+* @brief Forces the inline (Gives a strong-hint to the compiler)
+* @note Inline may still be rejected by the compiler if it is too complex or uses va_args
 */
 #if defined(__GNUC__) || defined(__clang__)
 
@@ -46,10 +37,15 @@ KEBAB_ABORT (Enables abort() on fatal errors handled by the library)
 
 #endif
 
-/// if the character is a math operator
+/**
+* @brief Is a math operator.
+* @note Supported operators: +, -, *, /, ^, %
+*/
 #define isMathOperator(c) ((c) == '+' || (c) == '-' || (c) == '*' || (c) == '/' || (c) == '^' || (c) == '%')
 
-/// Frees the pointer using free(1) and then sets it to NULL
+/**
+* @brief Frees the pointer and sets its variable to NULL
+*/
 #define nullFree(pointer) \
         do { \
             free((pointer)); \
@@ -59,68 +55,102 @@ KEBAB_ABORT (Enables abort() on fatal errors handled by the library)
 // Functions
 
 /**
-    Turns a string into a integar
-    SUPPORT: +1234, -1234
-    WARNING: DOES NOT SUPPORT DECIMALS
-    RETURN: 0 for success, -1 for failure
+* @brief Turns a string into a integer.
+*
+* @param src The input string.
+* @param out A pointer to store the integer.
+* @param nbytes Number of bytes to read.
+* @return 0 on success, -1 on failure.
+*
+* @note Supports -1234, +1234. Does NOT support decimals!
 */
 int strToInt(const char* __restrict__ src, intmax_t* _out, size_t nbytes);
 
 /**
-    Turns a string into a integar
-    SUPPORT: +1234
-    WARNING: DOES NOT SUPPORT DECIMALS OR NEGATIVE VALUES!
-    RETURN: 0 for success, -1 for failure
+* @brief Turns a string into a integer.
+*
+* @param src The input string.
+* @param out A pointer to store the integer.
+* @param nbytes Number of bytes to read.
+* @return 0 on success, -1 on failure.
+*
+* @note Supports +1234. Does NOT support decimals and negative values!
 */
 int strToUint(const char* __restrict__ src, uintmax_t* _out, size_t nbytes);
 
 /**
-    Checks if the string is integar only!
-    SUPPORT: +1234, -1234
-    WARNING: DOES NOT SUPPORT DECIMALS
-    RETURN: 1 (true) for YES, 0 (false) for NO
+* @brief Checks if the the string is a integer.
+*
+* @param src The input string.
+* @param nbytes Number of bytes to read.
+* @return 1 (true) for YES, 0 (false) for NO.
+*
+* @note Supports +1234, -1234. Does NOT support decimals!
 */
 bool isIntegar(const char* __restrict__ src, size_t nbytes);
 
 /**
-    Turns a string into a float
-    SUPPORT: 1.34, .5, 523, +1.34, 1.34e2, -1.34, 1.34e+343, 1.34e-34 (EXPONENT AND FRACTIONS)
-    WARNING: DO NOT USE THIS FOR HANDLING DOUBLE!
-    RETURN: 0 for success, -1 for failure
+* @brief Turns a string into a float.
+*
+* @param src The input string.
+* @param out A pointer to store the float.
+* @param nbytes Number of bytes to read.
+* @return 0 on success, -1 on failure.
+*
+* @note Supports 1.34, .5, 523, +1.34, 1.34e2, -1.34, 1.34e+343, 1.34e-34. Do not use this for handling double!
 */
 int strToFloat(const char* __restrict__ src, float* _out, size_t nbytes);
 
 /**
-    Turns a string into a double
-    SUPPORT: 1.34, .5, 523, +1.34, 1.34e2, -1.34, 1.34e+343, 1.34e-34 (EXPONENT AND FRACTIONS)
-    RETURN: 0 for success, -1 for failure
+* @brief Turns a string into a double.
+* 
+* @param src The input string.
+* @param out A pointer to store the double.
+* @param nbytes Number of bytes to read.
+* @return 0 on success, -1 on failure.
+*
+* @note Supports 1.34, .5, 523, +1.34, 1.34e2, -1.34, 1.34e+343, 1.34e-34 (EXPONENT AND FRACTIONS) 
 */
 int strToDouble(const char* __restrict__ src, double* _out, size_t nbytes);
 
 /**
-    Checks if the string is a decimal
-    SUPPORT: 1.34, .5, 523, +1.34, 1.34e2, -1.34, 1.34e+343, 1.34e-34 (EXPONENT AND FRACTIONS)
-    RETURN: 1 (true) for YES, 0 (false) for NO
+* @brief Checks if the string is a decimal.
+*
+* @param src The input string.
+* @param nbytes Number of bytes to read.
+* @return 1 (true) for YES, 0 (false) for NO.
+*
+* @note Supports 1.34, .5, 523, +1.34, 1.34e2, -1.34, 1.34e+343, 1.34e-34 (EXPONENT AND FRACTIONS)
 */
 bool isDecimal(const char* __restrict__ src, size_t nbytes);
 
-/** 
-    Calloc(2) + memcpy(3), simple, predictable and effective, also safer then realloc(2) because it wont silently change memory locations causing dangling pointers
-    INFO: New memory will be allocated using calloc(2) and your old memory will be safely copied using memcpy(3) and your old memory will be freed and its variable will be replaced with the new memory
-    NOTES: ResizeMemory(3) WILL abort() IF calloc(2) fails (The current state is PROBABLY unsafe) ALSO make sure that (void** restrict memory) IS A POINTER TO A VARIABLE!
-    RETURN: 0 for success, -1 for failure
+/**
+* @brief Uses calloc(2) + memcpy(3) to resize memory in a simple, safe and predictable way.
+*
+* @param memory A pointer to the VARIABLE that holds a pointer to the MEMORY (void**)
+* @param oldMemory The size of the old memory.
+* @param newMemory The size of the new memory.
+* @return 0 on success, -1 on failure
+* 
+* @note Safely copies memory using memcpy(3) and if you define KEBAB_ABORT it will abort() on fatal errors 
 */
 int resizeMemory(void** __restrict__ memory, size_t oldMemory, size_t newMemory);
 
 /**
-    FNV-1a 32bit hash, simple and effective!
-    RETURN: Hash
+* @brief FNV-1a 32bit hash, simple and effective!
+*
+* @param src The input.
+* @param nbytes Number of bytes to read.
+* @return Hash
 */
 uint32_t simpleHashU32(const void* __restrict__ src, size_t nbytes);
 
 /**
-    FNV-1a 64bit hash, simple and effective!
-    RETURN: Hash
+* @brief FNV-1a 64bit hash, simple and effective!
+*
+* @param src The input.
+* @param nbytes Number of bytes to read.
+* @return Hash
 */
 uint64_t simpleHashU64(const void* __restrict__ src, size_t nbytes);
 
