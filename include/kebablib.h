@@ -27,7 +27,7 @@ extern "C"
 
 #define force_inline __attribute__((always_inline)) inline
 
-#elif defined(__MSC_VER__)
+#elif defined(_MSC_VER)
 
 #define force_inline __forceinline
 
