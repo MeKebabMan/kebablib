@@ -48,8 +48,10 @@ extern "C"
 */
 #define nullFree(pointer) \
         do { \
-            free((pointer)); \
-            (pointer) = NULL; \
+            if ((pointer) != NULL) { \
+                free((pointer)); \
+                (pointer) = NULL; \
+            } \
         } while(0);
 
 // Functions
