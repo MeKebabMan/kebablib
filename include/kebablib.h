@@ -54,6 +54,16 @@ extern "C"
             } \
         } while(0);
 
+/**
+* @brief Safely change pointer values
+*/
+#define nullSet(pointer, value) \
+        do { \
+            if ((pointer) != NULL) { \
+                *(pointer) = (value); \
+            } \
+        } while(0);        
+
 // Functions
 
 /**
