@@ -18,3 +18,7 @@ Kebablib has a bunch of macros that help take advantage of certain compilers or 
 ``nullFree``
 * Brief: Frees the pointer and sets its variable to NULL
 * Note: uses ``free(1)`` to free the memory
+
+``nullSet``
+* Brief: Safely changes value of a pointer
+* Note: does not change the memory address ONLY the value ``*(X) = (Y)``
